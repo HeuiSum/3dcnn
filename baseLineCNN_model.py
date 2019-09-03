@@ -1,5 +1,7 @@
 # from __future__ import print_function
 import keras
+import numpy as np
+
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Conv3D, MaxPooling3D, GlobalAveragePooling3D
@@ -62,7 +64,10 @@ def modelConstructor():
 
     model.add(Dense(2, activation='softmax'))
     model.summary()
-    model.compile(optimizer='adam',
+
+    optimizerAdam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
+
+    model.compile(optimizer=optimizerAdam,
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
 
@@ -72,15 +77,28 @@ def modelConstructor():
 
 
 
-def modelTrain(trainData, trainLabel, epch):
+def modelTrain(trainData, trainLabel,epch, batch):
     model = modelConstructor()
-    model.fit(trainData, trainLabel, epochs=epch)
-    return model
+
+    # tb_hist = keras.callbacks.TensorBoard(log_dir='./graph', histogram_freq=0, write_graph=True, write_images=True)
+
+    # print(type(trainData),np.shape(trainData),np.shape(trainLabel))
+
+    hist = model.fit(trainData, trainLabel, epochs=epch, verbose= 2, batch_size=batch)
+
+    #
+    # print(hist.history['loss'])
+    # print(hist.history['acc'])
+    # print(hist.history['val_loss'])
+    # print(hist.history['val_acc'])
+
+
+    return hist
 
 def modelEvaluation(model, testData, testLabel):
 
     test_loss, test_acc = model.evaluate(testData, testLabel)
     print("test acc. is ", test_acc)
 
-modelConstructor()
+# modelConstructor()
 

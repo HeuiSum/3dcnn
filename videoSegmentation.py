@@ -17,17 +17,16 @@ def segVideo(filePath, isViolence):
     IMG_WIDTH =  320
 
 
-
     SEG_SIZE = 30   # segment size.
 
     seg = np.empty((TOTAL_FRAME, IMG_HEIGHT, IMG_WIDTH, 3)) # 3 channel data
 
     if(isViolence==True):
         #  폭력 영상의 label = 1
-        label = np.ones((TOTAL_FRAME))
+        label = np.ones((TOTAL_FRAME//16))
     else:
         #  노멀 영상의 label = 0
-        label = np.zeros((TOTAL_FRAME))
+        label = np.zeros((TOTAL_FRAME//16))
     # segment number
     idxSeg = 0
 
@@ -38,14 +37,14 @@ def segVideo(filePath, isViolence):
         # resize (240, 320). resize함수는 변수 순서가(넓이, 높이)로 정의되어있음.
         frameResized = cv2.resize(frame,(IMG_WIDTH, IMG_HEIGHT))
 
-        if (curFrame == TOTAL_FRAME):
+        if (curFrame ==  TOTAL_FRAME):
             break
         seg[idxSeg,:,:,:] = (frameResized/255.0) # regularization
 
-
+    res = np.array(seg[0:16*(TOTAL_FRAME//16)]).reshape(-1,16,240,320,3)
     videoIn.release()
 
 
 
     # print("done!")
-    return seg, label
+    return (res, label)
